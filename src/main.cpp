@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
         "  cterm  Copyright (C) 2026  Tr43212\n"
         "  This program comes with ABSOLUTELY NO WARRANTY.\n"
         "  This is free software, and you are welcome to redistribute it,\n"
-        "  under certain conditions.\n"
+        "  under certain conditions."
     );
 
     std::string config_path = "~/.config/cterm/config.jsonc";

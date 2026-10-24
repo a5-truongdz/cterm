@@ -30,7 +30,7 @@ CTerm::CTerm(const Config &config, std::string &working_dir) {
     if (!util::isDir(working_dir)) {
         std::cerr <<
             util::warning("Specified working directory doesn't exists (or is a file)"
-                          ", falling back to '.' (current directory).\n");
+                          ", falling back to '.' (current directory).");
         working_dir = ".";
     }
 
