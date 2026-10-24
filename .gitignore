@@ -1,0 +1,4 @@
+build/
+output/
+
+compile_commands.json

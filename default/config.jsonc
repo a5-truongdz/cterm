@@ -1,0 +1,11 @@
+{
+    "font": "monospace",
+    "fontSize": 12,
+    "colorSchemeDir": "/usr/share/qtermwidget6/color-schemes",
+    "colorScheme": "Breeze",
+    "backgroundOpacity": 1.0,
+    "shell": "/bin/bash",
+    "cursorShape": "block",
+    "scrollBarPosition": "right",
+    "terminalSizeHint": true
+}
