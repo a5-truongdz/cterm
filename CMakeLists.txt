@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.21)
 project(cterm
-    VERSION 1.0.0
+    VERSION 1.0.1
     LANGUAGES CXX
 )
 
@@ -34,6 +34,7 @@ FetchContent_MakeAvailable(cli11)
 qt_standard_project_setup()
 qt_add_executable(${PROJECT_NAME}
     src/config.cpp
+    src/keymap.cpp
     src/cterm.cpp
     src/main.cpp
 )

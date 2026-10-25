@@ -28,7 +28,7 @@ namespace fs = std::filesystem;
 
 namespace util {
 
-inline std::string expand_user(const std::string &path) {
+inline std::string expandUser(const std::string &path) {
     // case 1: path empty or not starts with ~
     if (path.empty() || path[0] != '~') {
         return path;
@@ -41,13 +41,13 @@ inline std::string expand_user(const std::string &path) {
         i = path.size();
     }
 
-    std::string user_home = "";
+    std::string userHome = "";
 
     if (i == 1) {
         // case 2: path starts with or is ~
         const char *home = std::getenv("HOME");
         if (home != nullptr) {
-            user_home = home;
+            userHome = home;
         } else {
             // fallback to passwd just in case
             struct passwd *pw = getpwuid(getuid());
@@ -57,7 +57,7 @@ inline std::string expand_user(const std::string &path) {
             }
 
             if (pw->pw_dir) {
-                user_home = pw->pw_dir;
+                userHome = pw->pw_dir;
             }
         }
     } else {
@@ -71,16 +71,16 @@ inline std::string expand_user(const std::string &path) {
         }
 
         if (pw->pw_dir) {
-            user_home = pw->pw_dir;
+            userHome = pw->pw_dir;
         }
     }
 
     // remove trailing /
-    while (!user_home.empty() && user_home.back() == '/') {
-        user_home.pop_back();
+    while (!userHome.empty() && userHome.back() == '/') {
+        userHome.pop_back();
     }
 
-    return user_home + path.substr(i);
+    return userHome + path.substr(i);
 }
 
 inline QString qstr(const std::string &s) {
@@ -88,13 +88,14 @@ inline QString qstr(const std::string &s) {
 }
 
 inline bool isDir(const std::string &path) {
-    fs::path fs_path = path;
-    return fs::is_directory(fs_path);
+    fs::path fsPath = path;
+    return fs::is_directory(fsPath);
 }
 
 inline bool isExecutable(const std::string &path) {
     // directories aint executable
-    if (!fs::exists(path) || isDir(path)) {
+    fs::path fsPath = path;
+    if (!fs::exists(fsPath) || isDir(path)) {
         return false;
     }
 

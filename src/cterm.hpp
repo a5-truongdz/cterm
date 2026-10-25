@@ -16,17 +16,28 @@
 #pragma once
 
 #include <string>
+#include <functional>
 
+#include <QFont>
 #include <QMainWindow>
 #include <qtermwidget.h>
 
 #include "config.hpp"
+#include "keymap.hpp"
 
 class CTerm : public QMainWindow {
 public:
-    explicit CTerm(const Config &config, std::string &working_dir);
+    explicit CTerm(const Config &config, const Keymap &keymap, std::string &workingDir);
 
 private:
-    QTermWidget *terminal;
+    QTermWidget       *terminal;
+    const std::string *fontName;
+    int               defaultFontSize;
+    int               currentFontSize;
+
     void updateTitle();
+    void zoomIn();
+    void zoomOut();
+    void resetZoom();
+    void bindKey(const std::string &key, const std::function<void()> &callback);
 };

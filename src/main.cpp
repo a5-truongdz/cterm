@@ -32,26 +32,33 @@ int main(int argc, char **argv) {
         "  under certain conditions."
     );
 
-    std::string config_path = "~/.config/cterm/config.jsonc";
+    std::string configPath = "~/.config/cterm/config.jsonc";
     cli.add_option(
         "-c,--config",
-        config_path,
+        configPath,
         "Path to configuration file."
     )->capture_default_str();
 
-    std::string working_dir = ".";
+    std::string keymapPath = "~/.config/cterm/keymap.jsonc";
+    cli.add_option(
+        "-k,--keymap",
+        keymapPath,
+        "Path to keymap file."
+    )->capture_default_str();
+
+    std::string workingDir = ".";
     cli.add_option(
         "-d,--directory",
-        working_dir,
+        workingDir,
         "Specify working directory."
     )->capture_default_str();
 
     CLI11_PARSE(cli, argc, argv);
-
     QApplication app(argc, argv);
 
-    Config config(util::expand_user(config_path));
-    CTerm cterm(config, working_dir);
+    Config config(util::expandUser(configPath));
+    Keymap keymap(util::expandUser(keymapPath));
+    CTerm cterm(config, keymap, workingDir);
 
     cterm.show();
     return app.exec();

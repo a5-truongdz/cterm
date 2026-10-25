@@ -1,0 +1,10 @@
+{
+    // Clipboard
+    "copy": "Ctrl+Shift+C",
+    "paste": "Ctrl+Shift+V",
+
+    // Zoom
+    "zoomIn": "Ctrl+=",
+    "zoomOut": "Ctrl+-",
+    "resetZoom": "Ctrl+0"
+}

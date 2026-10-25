@@ -19,14 +19,14 @@
 
 struct Config {
     std::string font = "monospace";
-    int font_size = 12;
-    std::string color_scheme_dir = "/usr/share/qtermwidget6/color-schemes";
-    std::string color_scheme = "Breeze";
+    int fontSize = 12;
+    std::string colorSchemeDir = "/usr/share/qtermwidget6/color-schemes";
+    std::string colorScheme = "Breeze";
     double opacity = 1.0;
     std::string shell = "/bin/bash";
-    std::string cursor_shape = "block";
-    std::string scroll_bar_pos = "right";
-    bool size_hint = true;
+    std::string cursorShape = "block";
+    std::string scrollBarPos = "right";
+    bool sizeHint = true;
 
     explicit Config(const std::string &path);
 };

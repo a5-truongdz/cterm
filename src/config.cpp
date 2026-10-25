@@ -18,7 +18,6 @@
 #include <string>
 #include <fstream>
 #include <iostream>
-#include <stdexcept>
 #include <nlohmann/json.hpp>
 
 #include "util.hpp"
@@ -33,51 +32,57 @@ Config::Config(const std::string &path) {
     } else {
         json data = json::parse(file, nullptr, true, true);
 
-        font             = data.value("font", font);
-        font_size        = data.value("fontSize", font_size);
-        color_scheme_dir = util::expand_user(data.value("colorSchemeDir", color_scheme_dir));
-        color_scheme     = data.value("colorScheme", color_scheme);
-        opacity          = data.value("backgroundOpacity", opacity);
-        shell            = data.value("shell", shell);
-        cursor_shape     = data.value("cursorShape", cursor_shape);
-        scroll_bar_pos   = data.value("scrollBarPosition", scroll_bar_pos);
-        size_hint        = data.value("terminalTypeHint", size_hint);
-    }
+        font           = data.value("font", font);
+        fontSize       = data.value("fontSize", fontSize);
+        colorSchemeDir = util::expandUser(data.value("colorSchemeDir", colorSchemeDir));
+        colorScheme    = data.value("colorScheme", colorScheme);
+        opacity        = data.value("backgroundOpacity", opacity);
+        shell          = data.value("shell", shell);
+        cursorShape    = data.value("cursorShape", cursorShape);
+        scrollBarPos   = data.value("scrollBarPosition", scrollBarPos);
+        sizeHint       = data.value("terminalTypeHint", sizeHint);
 
-    if (!util::isDir(color_scheme_dir)) {
-        std::cerr <<
-            util::warning("Color scheme directory doesn't exists (or is a file): " + color_scheme_dir);
-    }
+        if (fontSize <= 0) {
+            std::cerr <<
+                util::warning("Invalid font size '" + std::to_string(fontSize) +"', falling back to 12.");
+            fontSize = 12;
+        }
 
-    if (opacity < 0.0 || opacity > 1.0) {
-        std::cerr <<
-            util::warning("Invalid background opacity '" + std::to_string(opacity) + "', falling back to 1.");
-        opacity = 1.0;
-    }
+        if (!util::isDir(colorSchemeDir)) {
+            std::cerr <<
+                util::warning("Color scheme directory doesn't exists (or is a file): " + colorSchemeDir);
+        }
 
-    if (!util::isExecutable(shell)) {
-        std::cerr <<
-            util::warning("Non-executable shell '" + shell + "', falling back to bash.");
-        // qtermwidget auto falls back to bash
-    }
+        if (opacity < 0.0 || opacity > 1.0) {
+            std::cerr <<
+                util::warning("Invalid background opacity '" + std::to_string(opacity) + "', falling back to 1.");
+            opacity = 1.0;
+        }
 
-    if (
-        cursor_shape != "block" &&
-        cursor_shape != "ibeam" &&
-        cursor_shape != "underline"
-    ) {
-        std::cerr <<
-            util::warning("Unknown cursor type '" + cursor_shape + "', falling back to block.");
-        cursor_shape = "block";
-    }
+        if (!util::isExecutable(shell)) {
+            std::cerr <<
+                util::warning("Non-executable shell '" + shell + "', falling back to bash.");
+            // qtermwidget auto falls back to bash
+        }
 
-    if (
-        scroll_bar_pos != "no" &&
-        scroll_bar_pos != "left" &&
-        scroll_bar_pos != "right"
-    ) {
-        std::cerr <<
-            util::warning("Unknown scroll bar position '" + scroll_bar_pos + "', falling back to right.");
-        scroll_bar_pos = "right";
+        if (
+            cursorShape != "block" &&
+            cursorShape != "ibeam" &&
+            cursorShape != "underline"
+        ) {
+            std::cerr <<
+                util::warning("Unknown cursor type '" + cursorShape + "', falling back to block.");
+            cursorShape = "block";
+        }
+
+        if (
+            scrollBarPos != "no" &&
+            scrollBarPos != "left" &&
+            scrollBarPos != "right"
+        ) {
+            std::cerr <<
+                util::warning("Unknown scroll bar position '" + scrollBarPos + "', falling back to right.");
+            scrollBarPos = "right";
+        }
     }
 }

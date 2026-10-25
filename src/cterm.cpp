@@ -16,73 +16,115 @@
 #include "cterm.hpp"
 
 #include <iostream>
+#include <functional>
 
 #include <Qt>
 #include <QDir>
 #include <QFont>
+#include <QAction>
+#include <QKeySequence>
 #include <qtermwidget.h>
 
 #include "util.hpp"
 #include "config.hpp"
+#include "keymap.hpp"
 
-CTerm::CTerm(const Config &config, std::string &working_dir) {
-    working_dir = util::expand_user(working_dir);
-    if (!util::isDir(working_dir)) {
+CTerm::CTerm(const Config &config, const Keymap &keymap, std::string &workingDir)
+    : fontName(&config.font),
+      defaultFontSize(config.fontSize),
+      currentFontSize(config.fontSize) {
+    workingDir = util::expandUser(workingDir);
+    if (!util::isDir(workingDir)) {
         std::cerr <<
             util::warning("Specified working directory doesn't exists (or is a file)"
                           ", falling back to '.' (current directory).");
-        working_dir = ".";
+        workingDir = ".";
     }
 
-    setWindowTitle("cterm");
+    setWindowTitle("-");
     setAttribute(Qt::WA_TranslucentBackground);
     resize(800, 600);
 
     terminal = new QTermWidget(0, this);
-
-    QFont font(util::qstr(config.font), config.font_size);
+    QFont font(util::qstr(config.font), config.fontSize);
 
     // cursor shape
-    QTermWidget::KeyboardCursorShape cursor_shape;
-    if (config.cursor_shape == "ibeam") {
-        cursor_shape = QTermWidget::KeyboardCursorShape::IBeamCursor;
-    } else if (config.cursor_shape == "underline") {
-        cursor_shape = QTermWidget::KeyboardCursorShape::UnderlineCursor;
+    QTermWidget::KeyboardCursorShape cursorShape;
+    if (config.cursorShape == "ibeam") {
+        cursorShape = QTermWidget::KeyboardCursorShape::IBeamCursor;
+    } else if (config.cursorShape == "underline") {
+        cursorShape = QTermWidget::KeyboardCursorShape::UnderlineCursor;
     } else {
-        cursor_shape = QTermWidget::KeyboardCursorShape::BlockCursor;
+        cursorShape = QTermWidget::KeyboardCursorShape::BlockCursor;
     }
 
     // scroll bar pos
-    QTermWidget::ScrollBarPosition scroll_bar;
-    if (config.scroll_bar_pos == "no") {
-        scroll_bar = QTermWidget::ScrollBarPosition::NoScrollBar;
-    } else if (config.scroll_bar_pos == "left") {
-        scroll_bar = QTermWidget::ScrollBarPosition::ScrollBarLeft;
+    QTermWidget::ScrollBarPosition scrollBar;
+    if (config.scrollBarPos == "no") {
+        scrollBar = QTermWidget::ScrollBarPosition::NoScrollBar;
+    } else if (config.scrollBarPos == "left") {
+        scrollBar = QTermWidget::ScrollBarPosition::ScrollBarLeft;
     } else {
-        scroll_bar = QTermWidget::ScrollBarPosition::ScrollBarRight;
+        scrollBar = QTermWidget::ScrollBarPosition::ScrollBarRight;
     }
 
     // appearance
     terminal->setTerminalFont(font);
-    terminal->addCustomColorSchemeDir(util::qstr(config.color_scheme_dir));
-    terminal->setColorScheme(util::qstr(config.color_scheme));
+    terminal->addCustomColorSchemeDir(util::qstr(config.colorSchemeDir));
+    terminal->setColorScheme(util::qstr(config.colorScheme));
     terminal->setTerminalOpacity(config.opacity);
-    terminal->setKeyboardCursorShape(cursor_shape);
-    terminal->setScrollBarPosition(scroll_bar);
-    terminal->setTerminalSizeHint(config.size_hint);
-    terminal->setWorkingDirectory(util::qstr(working_dir));
+    terminal->setKeyboardCursorShape(cursorShape);
+    terminal->setScrollBarPosition(scrollBar);
+    terminal->setTerminalSizeHint(config.sizeHint);
+    terminal->setWorkingDirectory(util::qstr(workingDir));
 
-    // shell
-    terminal->setShellProgram(util::qstr(config.shell));
-    terminal->startShellProgram();
+    // keymaps
+    bindKey(keymap.keymaps.at("copy"), [this] { terminal->copyClipboard(); });
+    bindKey(keymap.keymaps.at("paste"), [this] { terminal->pasteClipboard(); });
+    bindKey(keymap.keymaps.at("zoomIn"), [this] { zoomIn(); });
+    bindKey(keymap.keymaps.at("zoomOut"), [this] { zoomOut(); });
+    bindKey(keymap.keymaps.at("resetZoom"), [this] { resetZoom(); });
 
     // hooks
     connect(terminal, &QTermWidget::finished, this, &QMainWindow::close);
     connect(terminal, &QTermWidget::titleChanged, this, &CTerm::updateTitle);
+
+    // shell
+    terminal->setShellProgram(util::qstr(config.shell));
+    terminal->startShellProgram();
 
     setCentralWidget(terminal);
 }
 
 void CTerm::updateTitle() {
     setWindowTitle(terminal->title());
+}
+
+void CTerm::zoomIn() {
+    ++currentFontSize;
+    QFont font(util::qstr(*fontName), currentFontSize );
+    terminal->setTerminalFont(font);
+}
+
+void CTerm::zoomOut() {
+    if (currentFontSize <= 0) {
+        return;
+    }
+
+    --currentFontSize;
+    QFont font(util::qstr(*fontName), currentFontSize + 1);
+    terminal->setTerminalFont(font);
+}
+
+void CTerm::resetZoom() {
+    QFont font(util::qstr(*fontName), defaultFontSize);
+    terminal->setTerminalFont(font);
+}
+
+void CTerm::bindKey(const std::string &key, const std::function<void()> &callback) {
+    QAction *action = new QAction(this);
+    action->setShortcut(QKeySequence(util::qstr(key)));
+    action->setShortcutContext(Qt::ShortcutContext::WindowShortcut);
+    connect(action, &QAction::triggered, this, callback);
+    addAction(action);
 }

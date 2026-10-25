@@ -1,11 +1,44 @@
 {
+    // Font to use.
     "font": "monospace",
+
+    // Font size.
     "fontSize": 12,
+
+    // The directory containing the color scheme.
+    // ~user expansion is supported.
+    // You can also use Konsole's one, too!
+    // (~/.local/share/konsole)
     "colorSchemeDir": "/usr/share/qtermwidget6/color-schemes",
+
+    // The color scheme to use.
+    // Make sure it exists as <name>.colorscheme
+    // in colorSchemeDir!
     "colorScheme": "Breeze",
+
+    // Background opacity.
+    // Might need a compositor to work.
     "backgroundOpacity": 1.0,
+
+    // The shell to launch.
+    // Will default to bash if not executable
+    // or file not exists.
     "shell": "/bin/bash",
+
+    // The cursor shape.
+    // Available choices are:
+    // "block", "ibeam" and "underline".
+    // Will default to block if invalid
     "cursorShape": "block",
+
+    // Scroll bar position.
+    // Available choices are:
+    // "no", "left" and "right".
+    // Will default to right if invalid.
     "scrollBarPosition": "right",
+
+    // Terminal size hint.
+    // The stuff that shows the size
+    // when you resize the windows.
     "terminalSizeHint": true
 }
