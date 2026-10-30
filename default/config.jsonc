@@ -41,7 +41,7 @@
     // Window title format.
     // Available field:
     // - $w: Working directory.
-    // - $s: Shell name.
+    // - $t: Shell-provided title.
     // - $$: A literal '$'.
     // - $p: Current running process name.
     // (fallback to shell name if none is running)
