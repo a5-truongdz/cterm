@@ -19,6 +19,7 @@
 #include <functional>
 
 #include <QFont>
+#include <QTimer>
 #include <QMainWindow>
 #include <qtermwidget.h>
 
@@ -30,10 +31,12 @@ public:
     explicit CTerm(const Config &config, const Keymap &keymap, std::string &workingDir);
 
 private:
-    QTermWidget       *terminal;
+    QTermWidget *terminal;
     const std::string *fontName;
-    int               defaultFontSize;
-    int               currentFontSize;
+    int defaultFontSize;
+    int currentFontSize;
+    const std::string *titleFormat;
+    QTimer *pidTimer;
 
     void updateTitle();
     void zoomIn();

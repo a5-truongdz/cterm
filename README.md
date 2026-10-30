@@ -3,6 +3,7 @@ A lightweight terminal emulator.
 
 # Dependencies
 - CMake >= 3.21.
+- Ninja.
 - Qt6.
 - QTermWidget - https://github.com/lxqt/qtermwidget.
 

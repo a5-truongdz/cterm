@@ -41,6 +41,8 @@ Config::Config(const std::string &path) {
         cursorShape    = data.value("cursorShape", cursorShape);
         scrollBarPos   = data.value("scrollBarPosition", scrollBarPos);
         sizeHint       = data.value("terminalTypeHint", sizeHint);
+        titleFormat    = data.value("windowTitleFormat", titleFormat);
+        titleFrequency = data.value("titleUpdateFrequency", titleFrequency);
 
         if (fontSize <= 0) {
             std::cerr <<
@@ -83,6 +85,12 @@ Config::Config(const std::string &path) {
             std::cerr <<
                 util::warning("Unknown scroll bar position '" + scrollBarPos + "', falling back to right.");
             scrollBarPos = "right";
+        }
+
+        if (titleFrequency < 0) {
+            std::cerr <<
+                util::warning("Invalid title update frequency '" + std::to_string(titleFrequency) + "', falling back to 500ms.");
+            titleFrequency = 500;
         }
     }
 }

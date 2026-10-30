@@ -16,7 +16,10 @@
 #pragma once
 
 #include <string>
+#include <cstddef>
 #include <cstdlib>
+#include <fstream>
+#include <iostream>
 #include <filesystem>
 
 #include <QString>
@@ -83,6 +86,38 @@ inline std::string expandUser(const std::string &path) {
     return userHome + path.substr(i);
 }
 
+inline std::string deExpandUser(const std::string &path) {
+    const char *home = std::getenv("HOME");
+
+    if (home == nullptr || home[0] == '\0') {
+        struct passwd *pw = getpwuid(getuid());
+
+        if (pw == nullptr || pw->pw_dir == nullptr) {
+            return path;
+        }
+
+        home = pw->pw_dir;
+    }
+
+    std::string userHome = home;
+
+    while (userHome.size() > 1 && userHome.back() == '/') {
+        userHome.pop_back();
+    }
+
+    if (path == userHome) {
+        return "~";
+    }
+
+    if (path.size() > userHome.size() &&
+        path.compare(0, userHome.size(), userHome) == 0 &&
+        path[userHome.size()] == '/') {
+        return "~" + path.substr(userHome.size());
+    }
+
+    return path;
+}
+
 inline QString qstr(const std::string &s) {
     return QString::fromStdString(s);
 }
@@ -107,6 +142,67 @@ inline bool isExecutable(const std::string &path) {
 
 inline std::string warning(const std::string &msg) {
     return "Warning: " + msg + "\n";
+}
+
+inline std::string ftitle(
+    const std::string &format,
+    const std::string &workingDir,
+    const std::string &process,
+    const std::string &shellTitle
+) {
+    std::string result;
+
+    for (std::size_t i = 0; i < format.size(); ++i) {
+        if (format[i] != '$' || i + 1 >= format.size()) {
+            // case 1: not starts with $ or at end of string
+            result += format[i];
+            continue;
+        }
+
+        // case 2: $ formatting
+        switch (format[i + 1]) {
+            case 'w':
+                // working directory
+                result += deExpandUser(workingDir);
+                ++i;
+                break;
+
+            case 'p':
+                // process name
+                result += process;
+                ++i;
+                break;
+
+            case 't':
+                // shell provided title
+                result += shellTitle;
+                ++i;
+                break;
+
+            case '$':
+                result += '$';
+                ++i;
+                break;
+
+            default:
+                // unknown format, preserve it
+                result += '$';
+                break;
+        }
+    }
+
+    return result;
+}
+
+inline std::string pidToName(int pid) {
+    std::ifstream comm("/proc/" + std::to_string(pid) + "/comm");
+    std::string name = "<unknown>";
+
+    if (comm.is_open()) {
+        std::getline(comm, name);
+    }
+
+    return name;
 }
 
 } // namespace util

@@ -27,6 +27,8 @@ struct Config {
     std::string cursorShape = "block";
     std::string scrollBarPos = "right";
     bool sizeHint = true;
+    std::string titleFormat = "$t";
+    int titleFrequency = 500;
 
     explicit Config(const std::string &path);
 };

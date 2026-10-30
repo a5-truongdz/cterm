@@ -1,4 +1,5 @@
 build/
 output/
+test/
 
 compile_commands.json

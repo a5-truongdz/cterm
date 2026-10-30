@@ -7,13 +7,11 @@
 
     // The directory containing the color scheme.
     // ~user expansion is supported.
-    // You can also use Konsole's one, too!
-    // (~/.local/share/konsole)
+    // You can also use Konsole's one, too! (~/.local/share/konsole)
     "colorSchemeDir": "/usr/share/qtermwidget6/color-schemes",
 
     // The color scheme to use.
-    // Make sure it exists as <name>.colorscheme
-    // in colorSchemeDir!
+    // Make sure it exists as <name>.colorscheme in colorSchemeDir!
     "colorScheme": "Breeze",
 
     // Background opacity.
@@ -21,8 +19,7 @@
     "backgroundOpacity": 1.0,
 
     // The shell to launch.
-    // Will default to bash if not executable
-    // or file not exists.
+    // Will default to bash if not executable or file not exists.
     "shell": "/bin/bash",
 
     // The cursor shape.
@@ -38,7 +35,19 @@
     "scrollBarPosition": "right",
 
     // Terminal size hint.
-    // The stuff that shows the size
-    // when you resize the windows.
-    "terminalSizeHint": true
+    // The stuff that shows the size when you resize the windows.
+    "terminalSizeHint": true,
+
+    // Window title format.
+    // Available field:
+    // - $w: Working directory.
+    // - $s: Shell name.
+    // - $$: A literal '$'.
+    // - $p: Current running process name.
+    // (fallback to shell name if none is running)
+    "windowTitleFormat": "$t",
+
+    // Title update frequency (in ms).
+    // How long it will wait before another title update.
+    "titleUpdateFrequency": "300"
 }

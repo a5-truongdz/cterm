@@ -1,4 +1,13 @@
 {
+    // Keybindings use Qt QKeySequence syntax.
+    // (https://doc.qt.io/qt-6/qkeysequence.html)
+    // Modifiers: Ctrl, Shift, Alt, Meta
+    // Combine modifiers and keys with '+'.
+    // Examples: Ctrl+C, Ctrl+Shift+V, Alt+F4
+
+    // Multiple shortcuts can also be specified using ','.
+    // Example: Ctrl+K, Ctrl+C
+
     // Clipboard
     "copy": "Ctrl+Shift+C",
     "paste": "Ctrl+Shift+V",

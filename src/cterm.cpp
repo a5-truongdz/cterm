@@ -21,6 +21,7 @@
 #include <Qt>
 #include <QDir>
 #include <QFont>
+#include <QTimer>
 #include <QAction>
 #include <QKeySequence>
 #include <qtermwidget.h>
@@ -32,7 +33,8 @@
 CTerm::CTerm(const Config &config, const Keymap &keymap, std::string &workingDir)
     : fontName(&config.font),
       defaultFontSize(config.fontSize),
-      currentFontSize(config.fontSize) {
+      currentFontSize(config.fontSize),
+      titleFormat(&config.titleFormat) {
     workingDir = util::expandUser(workingDir);
     if (!util::isDir(workingDir)) {
         std::cerr <<
@@ -46,6 +48,7 @@ CTerm::CTerm(const Config &config, const Keymap &keymap, std::string &workingDir
     resize(800, 600);
 
     terminal = new QTermWidget(0, this);
+    pidTimer = new QTimer(this);
     QFont font(util::qstr(config.font), config.fontSize);
 
     // cursor shape
@@ -76,7 +79,6 @@ CTerm::CTerm(const Config &config, const Keymap &keymap, std::string &workingDir
     terminal->setKeyboardCursorShape(cursorShape);
     terminal->setScrollBarPosition(scrollBar);
     terminal->setTerminalSizeHint(config.sizeHint);
-    terminal->setWorkingDirectory(util::qstr(workingDir));
 
     // keymaps
     bindKey(keymap.keymaps.at("copy"), [this] { terminal->copyClipboard(); });
@@ -87,22 +89,32 @@ CTerm::CTerm(const Config &config, const Keymap &keymap, std::string &workingDir
 
     // hooks
     connect(terminal, &QTermWidget::finished, this, &QMainWindow::close);
-    connect(terminal, &QTermWidget::titleChanged, this, &CTerm::updateTitle);
+    connect(pidTimer, &QTimer::timeout, this, &CTerm::updateTitle);
 
-    // shell
+    // setup
     terminal->setShellProgram(util::qstr(config.shell));
+    terminal->setWorkingDirectory(util::qstr(workingDir));
+
+    // start
     terminal->startShellProgram();
+    pidTimer->start(config.titleFrequency);
 
     setCentralWidget(terminal);
 }
 
 void CTerm::updateTitle() {
-    setWindowTitle(terminal->title());
+    setWindowTitle(util::qstr(util::ftitle(
+        *titleFormat,
+        terminal->workingDirectory().toStdString(),
+        // qtermwidget auto falls back to shell pid
+        util::pidToName(terminal->getForegroundProcessId()),
+        terminal->title().toStdString()
+    )));
 }
 
 void CTerm::zoomIn() {
     ++currentFontSize;
-    QFont font(util::qstr(*fontName), currentFontSize );
+    QFont font(util::qstr(*fontName), currentFontSize);
     terminal->setTerminalFont(font);
 }
 
@@ -112,11 +124,12 @@ void CTerm::zoomOut() {
     }
 
     --currentFontSize;
-    QFont font(util::qstr(*fontName), currentFontSize + 1);
+    QFont font(util::qstr(*fontName), currentFontSize);
     terminal->setTerminalFont(font);
 }
 
 void CTerm::resetZoom() {
+    currentFontSize = defaultFontSize;
     QFont font(util::qstr(*fontName), defaultFontSize);
     terminal->setTerminalFont(font);
 }
