@@ -49,5 +49,5 @@
 
     // Title update frequency (in ms).
     // How long it will wait before another title update.
-    "titleUpdateFrequency": "300"
+    "titleUpdateFrequency": "500"
 }
